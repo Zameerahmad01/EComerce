@@ -18,14 +18,10 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     //verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log(decoded);
-
     //get user details from database
     const user = await User.findById(decoded?.id).select(
       "-password -refreshToken"
     );
-
-    console.log(user);
 
     //if user is not found, throw an error
     if (!user) {
