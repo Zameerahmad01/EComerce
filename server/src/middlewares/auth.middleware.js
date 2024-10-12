@@ -8,7 +8,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     //get token from cookies or headers
     const token =
       req.cookies?.accessToken ||
-      req.headers("Authorization")?.replace("bearer ", "");
+      req.headers["authorization"]?.replace("bearer ", "");
 
     //if token is not present, throw an error
     if (!token) {
@@ -16,16 +16,20 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     }
 
     //verify the token
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    console.log(decoded);
 
     //get user details from database
-    const user = await User.findById(decoded?._id).select(
-      "-password, -refreshToken"
+    const user = await User.findById(decoded?.id).select(
+      "-password -refreshToken"
     );
+
+    console.log(user);
 
     //if user is not found, throw an error
     if (!user) {
-      throw new ApiError(401, "Unauthorized access");
+      throw new ApiError(401, "Unauthorized access user not found");
     }
 
     //attach user details to the request object
