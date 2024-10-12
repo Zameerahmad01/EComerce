@@ -1,7 +1,8 @@
-import { User } from "../models/user.model";
-import { asyncHandler } from "../utils/asyncHandler";
-import { AppError } from "../utils/appError";
-import { ApiResponse } from "../utils/apiResponse";
+import { User } from "../models/user.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
   try {
@@ -19,16 +20,17 @@ const generateAccessTokenAndRefreshToken = async (userId) => {
   }
 };
 
-const registerUser = asyncHandler(async (req, res, next) => {
+const registerUser = asyncHandler(async (req, res) => {
   const { userName, email, password } = req.body;
+  console.log("req.body", req.body);
 
   if (!userName || !email || !password) {
-    throw new AppError(400, "All fields are required");
+    throw new ApiError(400, "All fields are required");
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new AppError(400, "User already exists");
+    throw new ApiError(400, "User already exists");
   }
 
   const user = await User.create({
@@ -42,29 +44,31 @@ const registerUser = asyncHandler(async (req, res, next) => {
   );
 
   if (!user) {
-    throw new AppError(500, "Failed to create user");
+    throw new ApiError(500, "Failed to create user");
   }
 
-  res.status(201).json(new ApiResponse(201, user, "User created successfully"));
+  res
+    .status(201)
+    .json(new ApiResponse(201, createdUser, "User created successfully"));
 });
 
-const loginUser = asyncHandler(async (req, res, next) => {
+const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new AppError(400, "All fields are required");
+    throw new ApiError(400, "All fields are required");
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new AppError(400, "Invalid credentials");
+    throw new ApiError(400, "Invalid credentials");
   }
 
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new AppError(400, "Invalid password");
+    throw new ApiError(400, "Invalid password");
   }
 
   const { accessToken, refreshToken } =
@@ -86,11 +90,32 @@ const loginUser = asyncHandler(async (req, res, next) => {
       new ApiResponse(
         200,
         loggedInUser,
-        accessToken,
-        refreshToken,
+        // accessToken,
+        // refreshToken,
         "user logged in successfully"
       )
     );
 });
 
-export { registerUser, loginUser };
+const logoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $unset: { refreshToken: 1 },
+    },
+    { new: true }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("refreshToken", options)
+    .json(new ApiResponse(200, {}, "user logged out successfully"));
+});
+
+export { registerUser, loginUser, logoutUser };
