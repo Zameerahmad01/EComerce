@@ -24,12 +24,16 @@ const registerUser = asyncHandler(async (req, res) => {
   const { userName, email, password } = req.body;
 
   if (!userName || !email || !password) {
-    throw new ApiError(400, "All fields are required");
+    // throw new ApiError(400, "All fields are required");
+    res.json(new ApiResponse(400, {}, "All fields are required"));
   }
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new ApiError(400, "User already exists");
+    // throw new ApiError(400, "User already exists");
+    res.json(
+      new ApiResponse(500, {}, "User already exists please use another email")
+    );
   }
 
   const user = await User.create({
@@ -48,26 +52,29 @@ const registerUser = asyncHandler(async (req, res) => {
 
   res
     .status(201)
-    .json(new ApiResponse(201, createdUser, "User created successfully"));
+    .json(new ApiResponse(201, createdUser, "Register successfully"));
 });
 
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new ApiError(400, "All fields are required");
+    // throw new ApiError(400, "All fields are required");
+    res.json(new ApiResponse(400, {}, "All fields are required"));
   }
 
   const user = await User.findOne({ email });
 
   if (!user) {
-    throw new ApiError(400, "Invalid credentials");
+    // throw new ApiError(400, "Invalid credentials");
+    res.json(new ApiResponse(400, {}, "User does not exist"));
   }
 
   const isPasswordCorrect = await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(400, "Invalid password");
+    // throw new ApiError(400, "Invalid password");
+    res.json(new ApiResponse(400, {}, "Incorrect password"));
   }
 
   const { accessToken, refreshToken } =
@@ -91,7 +98,7 @@ const loginUser = asyncHandler(async (req, res) => {
         loggedInUser,
         // accessToken,
         // refreshToken,
-        "user logged in successfully"
+        "logged in successfully"
       )
     );
 });
