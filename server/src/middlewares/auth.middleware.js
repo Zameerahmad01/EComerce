@@ -12,7 +12,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     //if token is not present, throw an error
     if (!token) {
-      throw new ApiError(401, "Unauthorized access");
+      res.status(401).json(new ApiResponse(401, {}, "Unauthorized access"));
     }
 
     //verify the token
@@ -25,7 +25,9 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     //if user is not found, throw an error
     if (!user) {
-      throw new ApiError(401, "Unauthorized access user not found");
+      res
+        .status(401)
+        .json(new ApiResponse(401, {}, "Unauthorized access user not found"));
     }
 
     //attach user details to the request object
@@ -33,6 +35,6 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     next();
   } catch (error) {
     //if there is an error, throw an error
-    throw new ApiError(401, error?.message || "Invalid access token");
+    res.status(401).json(new ApiResponse(401, {}, "Invalid access token"));
   }
 });
