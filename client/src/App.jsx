@@ -19,6 +19,7 @@ import UnAuthPage from "./pages/unauth-page/unauth-page";
 import { useSelector, useDispatch } from "react-redux";
 import { checkAuth } from "./store/auth-slice";
 import { useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function App() {
   const { user, isAuthenticated, isLoading } = useSelector(
@@ -32,8 +33,11 @@ function App() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
+      <div className="relative flex justify-center items-center h-screen p-10">
+        <Skeleton className="w-[800px] h-[500px]" />
+        <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl font-bold">
+          Loading...
+        </p>
       </div>
     );
   }
