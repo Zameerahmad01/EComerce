@@ -1,14 +1,19 @@
 import { Input } from "../ui/input";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Label } from "../ui/label";
 import { FileIcon, UploadCloudIcon, XIcon } from "lucide-react";
 import { Button } from "../ui/button";
+import axios from "axios";
+import { Skeleton } from "../ui/skeleton";
 
 function ProductImageUpload({
   imageFile,
   setImageFile,
   uploadImageUrl,
   setUploadImageUrl,
+  loading,
+  setLoading,
+  isEdit,
 }) {
   const inputRef = useRef(null);
 
@@ -39,6 +44,29 @@ function ProductImageUpload({
     }
   }
 
+  async function uploadImageOnCloudinary() {
+    setLoading(true);
+    const data = new FormData();
+    data.append("image", imageFile);
+    const response = await axios.post(
+      "http://localhost:8000/api/v1/products/upload-image",
+      data
+    );
+
+    // console.log(response.data);
+    if (response?.data?.success) {
+      setUploadImageUrl(response.data.data.url);
+      setLoading(false);
+    }
+    // console.log(uploadImageUrl);
+  }
+
+  useEffect(() => {
+    if (imageFile !== null) {
+      uploadImageOnCloudinary();
+    }
+  }, [imageFile]);
+
   return (
     <div className="w-full max-w-md mx-auto mt-4">
       <label className="text-lg font-semibold mb-2 block" htmlFor="">
@@ -47,7 +75,9 @@ function ProductImageUpload({
       <div
         onDrag={handleDragOver}
         onDrop={handleDrop}
-        className="border-2 border-dashed rounded-lg p-4"
+        className={`border-2 border-dashed rounded-lg p-4 ${
+          isEdit ? "cursor-not-allowed" : "cursor-pointer"
+        }`}
       >
         <Input
           type="file"
@@ -55,15 +85,20 @@ function ProductImageUpload({
           className="hidden"
           ref={inputRef}
           onChange={handleImageChange}
+          disabled={isEdit}
         />
         {!imageFile ? (
           <Label
             htmlFor="image-upload"
-            className="flex flex-col items-center justify-center h-32 cursor-pointer"
+            className={`flex flex-col items-center justify-center h-32 ${
+              isEdit ? "cursor-not-allowed" : "cursor-pointer"
+            }`}
           >
             <UploadCloudIcon className="w-10 h-10 text-muted-foreground mb-2" />
             <span>Drag & drop or click to upload image</span>
           </Label>
+        ) : loading ? (
+          <Skeleton className="h-10 bg-gray-100" />
         ) : (
           <div className="flex items-center justify-between">
             <div className="flex items-center">
