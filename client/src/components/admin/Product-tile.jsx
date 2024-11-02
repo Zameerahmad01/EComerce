@@ -6,6 +6,7 @@ function AdminProductTile({
   setEditProduct,
   setFormData,
   setOpenCreateProduct,
+  handleDeleteProduct,
 }) {
   return (
     <Card className="w-full max-w-sm mx-auto">
@@ -43,7 +44,12 @@ function AdminProductTile({
           >
             Edit
           </Button>
-          <Button variant="destructive">Delete</Button>
+          <Button
+            onClick={() => handleDeleteProduct(product?._id)}
+            variant="destructive"
+          >
+            Delete
+          </Button>
         </CardFooter>
       </div>
     </Card>
