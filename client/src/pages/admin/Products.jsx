@@ -14,6 +14,7 @@ import {
   getAllProducts,
   addNewProduct,
   updateProduct,
+  deleteProduct,
 } from "@/store/admin/index";
 import { useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
@@ -76,6 +77,24 @@ const AdminProducts = () => {
         });
   }
 
+  function handleDeleteProduct(id) {
+    // console.log(id, "id");
+    dispatch(deleteProduct(id)).then((data) => {
+      console.log(data, "data");
+      if (data.payload.success) {
+        dispatch(getAllProducts());
+      }
+    });
+  }
+
+  function isFormValid() {
+    return Object.keys(formData)
+      .map((key) => formData[key] !== "")
+      .every((item) => item);
+  }
+
+  // console.log(isFormValid(), "isFormValid");
+
   useEffect(() => {
     dispatch(getAllProducts());
   }, [dispatch]);
@@ -98,6 +117,7 @@ const AdminProducts = () => {
               setEditProduct={setEditProduct}
               setOpenCreateProduct={setOpenCreateProduct}
               setFormData={setFormData}
+              handleDeleteProduct={handleDeleteProduct}
             />
           ))
         ) : (
@@ -134,6 +154,7 @@ const AdminProducts = () => {
               buttonText={editProduct !== null ? "Update" : "Add"}
               onSubmit={onSubmit}
               formControls={addProductFormElements}
+              // isBtnValid={!isFormValid()}
             />
           </div>
         </SheetContent>
