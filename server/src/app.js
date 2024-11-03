@@ -25,7 +25,9 @@ app.use(cookieParser());
 
 import userRoutes from "./routes/user.route.js";
 import productRoutes from "./routes/product.route.js";
+import shopRoutes from "./routes/shop.route.js";
 
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/shop/products", shopRoutes);
 export { app };
