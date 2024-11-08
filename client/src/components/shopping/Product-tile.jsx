@@ -6,10 +6,10 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-function ShoppingProductTile({ product }) {
+function ShoppingProductTile({ product, handleProductDetails }) {
   return (
     <Card className="w-full max-w-sm mx-auto">
-      <div>
+      <div onClick={() => handleProductDetails(product?._id)}>
         <div className="relative">
           <img
             src={product?.image}
@@ -35,14 +35,16 @@ function ShoppingProductTile({ product }) {
           <div className="flex items-center justify-between">
             <span
               className={`${
-                product?.salePrice > 0 ? "line-through" : ""
-              } text-lg font-semibold text-primary`}
+                product?.salePrice > 0
+                  ? "line-through text-muted-foreground"
+                  : "text-primary"
+              } text-lg font-semibold `}
             >
-              {product?.price}
+              ${product?.price}
             </span>
             {product?.salePrice > 0 ? (
               <span className="text-lg font-semibold text-primary">
-                {product?.salePrice}
+                ${product?.salePrice}
               </span>
             ) : null}
           </div>
