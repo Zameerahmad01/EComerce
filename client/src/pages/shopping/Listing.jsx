@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { sortOptions } from "@/config";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getFilteredProducts } from "@/store/shop/product-slice";
-import { useSelector } from "react-redux";
 import ShoppingProductTile from "@/components/shopping/Product-tile";
-import { Item } from "@radix-ui/react-dropdown-menu";
 import { useSearchParams } from "react-router-dom";
+import { getProductDetails } from "@/store/shop/product-slice";
+import ProductDetailsDialog from "@/components/shopping/Product-details";
 
+//function for creating search params
 function createSearchParamsHelper(filtersParams) {
   const queryParams = [];
   for (const [key, value] of Object.entries(filtersParams)) {
@@ -30,20 +31,21 @@ function createSearchParamsHelper(filtersParams) {
 
 const ShoppingListing = () => {
   const dispatch = useDispatch();
-  const { productsList, isLoading } = useSelector(
+  const { productsList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [openDetails, setOpenDetails] = useState(false);
 
   function handleSort(value) {
     setSort(value);
   }
 
+  //function for handling filters
   function handleFilter(getSectionId, getCurrentOption) {
     // console.log(getSectionId, getCurrentOption);
-
     let copyFilters = { ...filters };
     const indexOfCurrentSection =
       Object.keys(copyFilters).indexOf(getSectionId);
@@ -67,15 +69,23 @@ const ShoppingListing = () => {
     sessionStorage.setItem("filters", JSON.stringify(copyFilters));
   }
 
+  function handleProductDetails(id) {
+    console.log(id);
+    dispatch(getProductDetails(id));
+  }
+
+  useEffect(() => {
+    if (productDetails) setOpenDetails(true);
+  }, [productDetails]);
+  //function for creating search params
   useEffect(() => {
     if (filters && Object.keys(filters).length > 0) {
       const createQueryString = createSearchParamsHelper(filters);
-      // console.log(createQueryString, "createQueryString");
-
       setSearchParams(new URLSearchParams(createQueryString));
     }
   }, [filters]);
 
+  //function for getting filters from session storage
   useEffect(() => {
     const filters = sessionStorage.getItem("filters");
     if (filters) {
@@ -84,6 +94,7 @@ const ShoppingListing = () => {
     setSort("price-lowtohigh");
   }, []);
 
+  //function for getting filtered products
   useEffect(() => {
     if (filters !== null && sort !== null)
       dispatch(
@@ -91,7 +102,7 @@ const ShoppingListing = () => {
       );
   }, [dispatch, sort, filters]);
 
-  // console.log(filters, sort, searchParams, "filters and sort");
+  // console.log(filters, sort, searchParams.toString(), "filters and sort");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
@@ -129,13 +140,22 @@ const ShoppingListing = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
           {productsList.length > 0 ? (
             productsList.map((product) => (
-              <ShoppingProductTile key={product._id} product={product} />
+              <ShoppingProductTile
+                key={product._id}
+                product={product}
+                handleProductDetails={handleProductDetails}
+              />
             ))
           ) : (
             <div>No products found</div>
           )}
         </div>
       </div>
+      <ProductDetailsDialog
+        productDetails={productDetails}
+        open={openDetails}
+        setOpen={setOpenDetails}
+      />
     </div>
   );
 };
