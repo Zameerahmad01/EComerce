@@ -46,4 +46,19 @@ const getFilteredProducts = asyncHandler(async (req, res) => {
   }
 });
 
-export { getFilteredProducts };
+const getProductDetails = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const product = await Product.findById(id);
+
+  if (!product) {
+    res.status(404).json(new ApiResponse(404, null, "Product not found"));
+  }
+
+  res
+    .status(200)
+    .json(
+      new ApiResponse(200, product, "Product details fetched successfully")
+    );
+});
+export { getFilteredProducts, getProductDetails };
