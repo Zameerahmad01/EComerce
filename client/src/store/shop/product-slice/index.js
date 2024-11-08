@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 const initialState = {
   productsList: [],
+  productDetails: null,
   isLoading: false,
 };
 
@@ -23,6 +24,16 @@ export const getFilteredProducts = createAsyncThunk(
   }
 );
 
+export const getProductDetails = createAsyncThunk(
+  "products/getProductDetails",
+  async (id) => {
+    const response = await axios.get(
+      `http://localhost:8000/api/v1/shop/products/get/${id}`
+    );
+    return response?.data;
+  }
+);
+
 const shopProductSlice = createSlice({
   name: "shoppingProducts",
   initialState,
@@ -39,6 +50,17 @@ const shopProductSlice = createSlice({
     builder.addCase(getFilteredProducts.rejected, (state) => {
       state.isLoading = false;
       state.productsList = [];
+    });
+    builder.addCase(getProductDetails.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(getProductDetails.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.productDetails = action.payload.data;
+    });
+    builder.addCase(getProductDetails.rejected, (state) => {
+      state.isLoading = false;
+      state.productDetails = null;
     });
   },
 });
