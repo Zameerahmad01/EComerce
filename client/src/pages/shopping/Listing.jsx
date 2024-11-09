@@ -16,6 +16,8 @@ import ShoppingProductTile from "@/components/shopping/Product-tile";
 import { useSearchParams } from "react-router-dom";
 import { getProductDetails } from "@/store/shop/product-slice";
 import ProductDetailsDialog from "@/components/shopping/Product-details";
+import { addToCart, getCartItems } from "@/store/shop/cart-slice";
+import { useToast } from "@/hooks/use-toast";
 
 //function for creating search params
 function createSearchParamsHelper(filtersParams) {
@@ -34,10 +36,12 @@ const ShoppingListing = () => {
   const { productsList, productDetails, isLoading } = useSelector(
     (state) => state.shopProducts
   );
+  const { user } = useSelector((state) => state.auth);
   const [filters, setFilters] = useState({});
   const [sort, setSort] = useState(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [openDetails, setOpenDetails] = useState(false);
+  const { toast } = useToast();
 
   function handleSort(value) {
     setSort(value);
@@ -70,8 +74,23 @@ const ShoppingListing = () => {
   }
 
   function handleProductDetails(id) {
-    console.log(id);
+    // console.log(id);
     dispatch(getProductDetails(id));
+  }
+
+  function handleAddToCart(id) {
+    // console.log(id);
+    dispatch(addToCart({ userId: user._id, productId: id, quantity: 1 })).then(
+      (data) => {
+        // console.log(data);
+        if (data.payload.success) {
+          dispatch(getCartItems(user._id));
+        }
+        toast({
+          title: "Product added to cart",
+        });
+      }
+    );
   }
 
   useEffect(() => {
@@ -101,8 +120,6 @@ const ShoppingListing = () => {
         getFilteredProducts({ filterParams: filters, sortParams: sort })
       );
   }, [dispatch, sort, filters]);
-
-  // console.log(filters, sort, searchParams.toString(), "filters and sort");
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6">
@@ -144,6 +161,7 @@ const ShoppingListing = () => {
                 key={product._id}
                 product={product}
                 handleProductDetails={handleProductDetails}
+                handleAddToCart={handleAddToCart}
               />
             ))
           ) : (
