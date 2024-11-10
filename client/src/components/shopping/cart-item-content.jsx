@@ -50,6 +50,7 @@ function UserCartItemsContent({ cartItem }) {
         <div className="flex items-center mt-1 gap-2">
           <Button
             onClick={() => handleQuantity(cartItem, "minus")}
+            disabled={cartItem?.quantity === 1}
             variant="outline"
             size="icon"
             className="w-8 h-8 rounded"
