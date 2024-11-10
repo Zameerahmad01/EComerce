@@ -4,6 +4,10 @@ import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-item-content";
 
 function UserCartWrapper({ cartItems }) {
+  const TotalPrice = cartItems.reduce(
+    (acc, item) => acc + (item.salePrice || item.price) * item.quantity,
+    0
+  );
   return (
     <SheetContent className="sm:max-w-md ">
       <SheetHeader>
@@ -21,7 +25,9 @@ function UserCartWrapper({ cartItems }) {
       <div className="mt-8 space-y-4">
         <div className="flex justify-between">
           <span className="text-lg font-semibold">Total</span>
-          <span className="text-lg font-semibold">$0.00</span>
+          <span className="text-lg font-semibold">
+            ${TotalPrice.toFixed(2)}
+          </span>
         </div>
       </div>
       <Button className="w-full mt-4">Checkout</Button>
