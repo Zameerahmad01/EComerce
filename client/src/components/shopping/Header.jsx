@@ -19,13 +19,32 @@ import { useDispatch } from "react-redux";
 import UserCartWrapper from "./cart-wraper";
 import { useState, useEffect } from "react";
 import { getCartItems } from "../../store/shop/cart-slice";
+import { Label } from "../ui/label";
+
 const MenuItems = () => {
+  const navigate = useNavigate();
+  const handleNavigate = (item) => {
+    sessionStorage.removeItem("filters");
+    const currentFilters =
+      item.id !== "home" && item.id !== "products"
+        ? { category: [item.id] }
+        : null;
+    sessionStorage.setItem("filters", JSON.stringify(currentFilters));
+    navigate(item.path);
+  };
+
   return (
     <nav className="flex flex-col mb-3 lg:mb-0 lg:items-center gap-6 lg:flex-row">
       {shoppingViewHeaderMenuItems.map((item) => (
-        <Link className="text-sm font-medium" to={item.path} key={item.id}>
+        <Label
+          className="text-sm font-medium cursor-pointer"
+          onClick={() => {
+            handleNavigate(item);
+          }}
+          key={item.id}
+        >
           {item.label}
-        </Link>
+        </Label>
       ))}
     </nav>
   );
