@@ -4,10 +4,24 @@ import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { StarIcon } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { setProductDetails } from "@/store/shop/product-slice";
 
-function ProductDetailsDialog({ productDetails, open, setOpen }) {
+function ProductDetailsDialog({
+  productDetails,
+  handleAddToCart,
+  open,
+  setOpen,
+}) {
+  const dispatch = useDispatch();
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        setOpen(false);
+        dispatch(setProductDetails());
+      }}
+    >
       <DialogContent className="max-w-[90vw] grid grid-cols-2 gap-8 sm:max-w-[80vw] lg:max-w-[70vw]">
         <div className="relative overflow-hidden rounded-lg">
           <img
@@ -52,7 +66,12 @@ function ProductDetailsDialog({ productDetails, open, setOpen }) {
             <span className=" text-muted-foreground">(5.0)</span>
           </div>
           <div className="mt-5">
-            <Button className="w-full">Add to Cart</Button>
+            <Button
+              className="w-full"
+              onClick={() => handleAddToCart(productDetails?._id)}
+            >
+              Add to Cart
+            </Button>
           </div>
           <Separator />
           <div className="max-h-[300px] overflow-auto">
