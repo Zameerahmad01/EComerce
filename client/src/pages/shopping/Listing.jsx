@@ -111,6 +111,11 @@ const ShoppingListing = ({ isHome }) => {
       setFilters(JSON.parse(filters));
     }
     setSort("price-lowtohigh");
+
+    if (isHome) {
+      setSort("price-lowtohigh");
+      setFilters({});
+    }
   }, []);
 
   //function for getting filtered products
@@ -121,10 +126,16 @@ const ShoppingListing = ({ isHome }) => {
       );
   }, [dispatch, sort, filters]);
 
+  // if (isLoading)
+  //   return (
+  //     <div className="flex justify-center items-center h-screen">
+  //       Loading...
+  //     </div>
+  //   );
   return (
     <div
-      className={`grid grid-cols-1 md:grid-cols-[300px_1fr] gap-6 p-4 md:p-6 ${
-        isHome ? "md:grid-cols-[1fr]" : ""
+      className={`grid grid-cols-1 gap-6 p-4 md:p-6 ${
+        isHome ? "md:grid-cols-[1fr]" : "md:grid-cols-[300px_1fr] "
       }`}
     >
       {!isHome ? (
