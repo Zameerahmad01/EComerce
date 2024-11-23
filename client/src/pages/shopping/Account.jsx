@@ -5,7 +5,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../components/ui/tabs";
-import Orders from "../../components/shopping/Orders";
+import ShoppingOrders from "../../components/shopping/Orders";
 import Address from "../../components/shopping/Address";
 const ShoppingAccount = () => {
   return (
@@ -25,7 +25,7 @@ const ShoppingAccount = () => {
               <TabsTrigger value="address">Address</TabsTrigger>
             </TabsList>
             <TabsContent value="orders">
-              <Orders />
+              <ShoppingOrders />
             </TabsContent>
             <TabsContent value="address">
               <Address />

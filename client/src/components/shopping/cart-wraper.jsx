@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import UserCartItemsContent from "./cart-item-content";
 import { useNavigate } from "react-router-dom";
 
-function UserCartWrapper({ cartItems }) {
+function UserCartWrapper({ cartItems, setCartOpen }) {
   const navigate = useNavigate();
 
   const TotalPrice = cartItems.reduce(
@@ -34,7 +34,10 @@ function UserCartWrapper({ cartItems }) {
         </div>
       </div>
       <Button
-        onClick={() => navigate("/shop/checkout")}
+        onClick={() => {
+          navigate("/shop/checkout");
+          setCartOpen(false);
+        }}
         className="w-full mt-4"
       >
         Checkout

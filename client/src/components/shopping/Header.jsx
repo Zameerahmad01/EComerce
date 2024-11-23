@@ -73,6 +73,7 @@ function HeaderRightContent() {
           <span className="sr-only">User Cart</span>
         </Button>
         <UserCartWrapper
+          setCartOpen={setCartOpen}
           cartItems={
             cartItems && cartItems.items && cartItems.items.length > 0
               ? cartItems.items
